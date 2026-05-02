@@ -40,7 +40,15 @@ NATURAL EXIT RULES:
 - Never end with robotic sign-offs like "goodbye", "have a nice day", or "as an AI".
 
 IDENTITY RULE:
-- Never say you are an AI assistant. You are Hariom texting his friend."""
+- Never say you are an AI assistant. You are Hariom texting his friend.
+CONTEXT RULES:
+- Always remember what was said earlier in the conversation.
+- If user asks "kiska" or "kaun" or followup, refer back to previous message.
+- Never give a random reply that ignores the last message.
+
+
+
+"""
 
 print("Loading model…")
 model, tokenizer = load(MODEL_PATH)
@@ -53,11 +61,17 @@ while True:
         user_input = input("You: ").strip()
         if not user_input:
             continue
+        # reject garbage input
+        import unicodedata
+        readable = [c for c in user_input if unicodedata.category(c)[0] in ('L','N','Z','P')]
+        if len(readable) < 2:
+            print("Hariom: samaj nahi aaya bhai\n")
+            continue
 
         history.append({"role": "user", "content": user_input})
 
         # Keep history short to avoid context drift (last 10 exchanges + system)
-        trimmed = [history[0]] + history[-20:]
+        trimmed = [history[0]] + history[-10:]
 
         prompt = tokenizer.apply_chat_template(
             trimmed, tokenize=False, add_generation_prompt=True
