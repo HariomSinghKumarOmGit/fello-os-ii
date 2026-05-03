@@ -2,3 +2,4 @@ adapters/
 fused-model/
 fused-model-8b/model.safetensors
 _chat.txt
+.DS_Store
